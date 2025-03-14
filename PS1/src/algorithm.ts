@@ -19,8 +19,21 @@ import { Flashcard, AnswerDifficulty, BucketMap } from "./flashcards";
  * @spec.requires buckets is a valid representation of flashcard buckets.
  */
 export function toBucketSets(buckets: BucketMap): Array<Set<Flashcard>> {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+  // Determine the highest bucket number to size the array correctly
+  const maxBucket = Math.max(0, ...Array.from(buckets.keys()));
+  
+  // Initialize an array of empty sets of appropriate length
+  const bucketArray: Array<Set<Flashcard>> = Array.from(
+      { length: maxBucket + 1 },
+      () => new Set<Flashcard>()
+  );
+  
+  // Populate the array with flashcards from the map
+  for (const [bucket, flashcards] of buckets.entries()) {
+      bucketArray[bucket] = new Set(flashcards);
+  }
+  
+  return bucketArray;
 }
 
 /**
@@ -34,9 +47,26 @@ export function toBucketSets(buckets: BucketMap): Array<Set<Flashcard>> {
 export function getBucketRange(
   buckets: Array<Set<Flashcard>>
 ): { minBucket: number; maxBucket: number } | undefined {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+    // Find the indices of the first and last non-empty bucket
+    let minBucket: number | null = null;
+    let maxBucket: number | null = null;
+
+    for (let i = 0; i < buckets.length; i++) {
+        const bucket = buckets[i];
+        if (bucket instanceof Set && bucket.size > 0) {
+            if (minBucket === null) {
+                minBucket = i;
+            }
+            maxBucket = i;
+        }
+    }
+
+    return minBucket !== null && maxBucket !== null
+        ? { minBucket, maxBucket }
+        : undefined;
 }
+
+
 
 /**
  * Selects cards to practice on a particular day.
