@@ -16,12 +16,16 @@ import {
  * TODO: Describe your testing strategy for toBucketSets() here.
  */
 describe("toBucketSets()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("should correctly convert a single bucket map", () => {
+    const flashcard1 = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
+
+    const buckets: BucketMap = new Map([[0, new Set([flashcard1])]]);
+    const expected = [new Set([flashcard1])];
+
+    assert.deepStrictEqual(toBucketSets(buckets), expected);
   });
 });
+
 
 /*
  * Testing strategy for getBucketRange():
@@ -29,12 +33,21 @@ describe("toBucketSets()", () => {
  * TODO: Describe your testing strategy for getBucketRange() here.
  */
 describe("getBucketRange()", () => {
-  it("Example test case - replace with your own tests", () => {
-    assert.fail(
-      "Replace this test case with your own tests based on your testing strategy"
-    );
+  it("should return correct range for multiple non-empty buckets", () => {
+    const flashcard1 = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
+    const flashcard2 = new Flashcard("Q2", "A2", "Hint for Q2", ["tag2"]);
+
+    const buckets: Array<Set<Flashcard>> = [
+      new Set<Flashcard>(), // Empty bucket
+      new Set<Flashcard>([flashcard1]), // Flashcard in bucket 1
+      new Set<Flashcard>(), // Empty bucket
+      new Set<Flashcard>([flashcard2])  // Flashcard in bucket 3
+    ];
+
+    assert.deepStrictEqual(getBucketRange(buckets), { minBucket: 1, maxBucket: 3 });
   });
 });
+
 
 /*
  * Testing strategy for practice():
