@@ -77,12 +77,25 @@ export function getBucketRange(
  *          according to the Modified-Leitner algorithm.
  * @spec.requires buckets is a valid Array-of-Set representation of flashcard buckets.
  */
+
 export function practice(
   buckets: Array<Set<Flashcard>>,
   day: number
 ): Set<Flashcard> {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+  const practiceSet: Set<Flashcard> = new Set();
+
+  for (let i = 0; i < buckets.length; i++) {
+    if (day % (1 << i) === 0) {
+      const bucket = buckets[i];
+      if (bucket) {
+        for (const card of bucket) {
+          practiceSet.add(card);
+        }
+      }
+    }
+  }
+
+  return practiceSet;
 }
 
 /**
@@ -99,9 +112,40 @@ export function update(
   card: Flashcard,
   difficulty: AnswerDifficulty
 ): BucketMap {
-  // TODO: Implement this function
-  throw new Error("Implement me!");
+  const newBuckets = new Map(buckets);
+
+  let currentBucket: number | undefined;
+
+  for (const [bucket, cards] of newBuckets.entries()) {
+    if (cards.has(card)) {
+      currentBucket = bucket;
+      cards.delete(card);
+      break;
+    }
+  }
+
+  if (currentBucket === undefined) {
+    throw new Error("Card not found in any bucket");
+  }
+
+  let newBucket = currentBucket;
+
+  if (difficulty === AnswerDifficulty.Easy) {
+    newBucket = Math.min(currentBucket + 1, newBuckets.size - 1);
+  } else if (difficulty === AnswerDifficulty.Hard) {
+    newBucket = Math.max(currentBucket - 1, 0);
+  }
+
+  if (!newBuckets.has(newBucket)) {
+    newBuckets.set(newBucket, new Set());
+  }
+
+  newBuckets.get(newBucket)!.add(card);
+
+  return newBuckets;
 }
+
+
 
 /**
  * Generates a hint for a flashcard.
@@ -111,9 +155,25 @@ export function update(
  * @spec.requires card is a valid Flashcard.
  */
 export function getHint(card: Flashcard): string {
-  // TODO: Implement this function (and strengthen the spec!)
-  throw new Error("Implement me!");
+  if (!card || !card.front || typeof card.front !== "string") {
+    throw new Error("Invalid flashcard");
+  }
+
+  const words = card.front.split(" ");
+  if (words.length === 0 || !words[0]) {
+    return "..."; // Return a default hint if there's no valid text
+  }
+
+  if (words.length === 1) {
+    return words[0].slice(0, Math.max(1, Math.floor(words[0].length / 2))) + "...";
+  }
+
+  return words
+    .map(word => (word ? word.slice(0, Math.max(1, Math.floor(word.length / 2))) + "..." : "..."))
+    .join(" ");
 }
+
+
 
 /**
  * Computes statistics about the user's learning progress.
