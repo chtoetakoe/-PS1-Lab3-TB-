@@ -116,6 +116,7 @@ export function update(
 
   let currentBucket: number | undefined;
 
+  // Find the current bucket of the flashcard
   for (const [bucket, cards] of newBuckets.entries()) {
     if (cards.has(card)) {
       currentBucket = bucket;
@@ -130,20 +131,25 @@ export function update(
 
   let newBucket = currentBucket;
 
+  // Fix: Move to the next bucket correctly
   if (difficulty === AnswerDifficulty.Easy) {
-    newBucket = Math.min(currentBucket + 1, newBuckets.size - 1);
+    newBucket = Math.min(currentBucket + 1, Math.max(...newBuckets.keys(), currentBucket + 1));
   } else if (difficulty === AnswerDifficulty.Hard) {
     newBucket = Math.max(currentBucket - 1, 0);
   }
 
+  // Ensure the new bucket exists
   if (!newBuckets.has(newBucket)) {
     newBuckets.set(newBucket, new Set());
   }
 
+  // Move card to the new bucket
   newBuckets.get(newBucket)!.add(card);
 
   return newBuckets;
 }
+
+
 
 
 
@@ -161,17 +167,14 @@ export function getHint(card: Flashcard): string {
 
   const words = card.front.split(" ");
   if (words.length === 0 || !words[0]) {
-    return "..."; // Return a default hint if there's no valid text
-  }
-
-  if (words.length === 1) {
-    return words[0].slice(0, Math.max(1, Math.floor(words[0].length / 2))) + "...";
+    return "..."; // Return default hint if no valid words
   }
 
   return words
-    .map(word => (word ? word.slice(0, Math.max(1, Math.floor(word.length / 2))) + "..." : "..."))
+    .map(word => word.slice(0, Math.ceil(word.length / 2)) + "...")
     .join(" ");
 }
+
 
 
 

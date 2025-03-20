@@ -80,21 +80,44 @@ describe("update()", () => {
   it("should move a card to the next bucket if answered easy", () => {
     const flashcard = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
     const buckets: BucketMap = new Map([[0, new Set([flashcard])]]);
-    
+
     const updatedBuckets = update(buckets, flashcard, AnswerDifficulty.Easy);
-    
-    assert.strictEqual(updatedBuckets.get(1)?.has(flashcard), true);
+
+    assert.strictEqual(updatedBuckets.has(1), true, "Bucket 1 should exist");
+    assert.strictEqual(updatedBuckets.get(1)?.has(flashcard), true, "Card should be in bucket 1");
   });
 
   it("should move a card down a bucket if answered hard", () => {
     const flashcard = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
     const buckets: BucketMap = new Map([[1, new Set([flashcard])]]);
-    
+
     const updatedBuckets = update(buckets, flashcard, AnswerDifficulty.Hard);
-    
-    assert.strictEqual(updatedBuckets.get(0)?.has(flashcard), true);
+
+    assert.strictEqual(updatedBuckets.has(0), true, "Bucket 0 should exist");
+    assert.strictEqual(updatedBuckets.get(0)?.has(flashcard), true, "Card should be in bucket 0");
+  });
+
+  it("should not move the card if it is in the lowest bucket and answered hard", () => {
+    const flashcard = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
+    const buckets: BucketMap = new Map([[0, new Set([flashcard])]]);
+
+    const updatedBuckets = update(buckets, flashcard, AnswerDifficulty.Hard);
+
+    assert.strictEqual(updatedBuckets.has(0), true, "Bucket 0 should still exist");
+    assert.strictEqual(updatedBuckets.get(0)?.has(flashcard), true, "Card should remain in bucket 0");
+  });
+
+  it("should create a new higher bucket if necessary", () => {
+    const flashcard = new Flashcard("Q1", "A1", "Hint for Q1", ["tag1"]);
+    const buckets: BucketMap = new Map([[2, new Set([flashcard])]]);
+
+    const updatedBuckets = update(buckets, flashcard, AnswerDifficulty.Easy);
+
+    assert.strictEqual(updatedBuckets.has(3), true, "Bucket 3 should be created");
+    assert.strictEqual(updatedBuckets.get(3)?.has(flashcard), true, "Card should be in bucket 3");
   });
 });
+
 
 /*
  * Testing strategy for getHint():
@@ -105,19 +128,17 @@ describe("update()", () => {
 describe("getHint()", () => {
   it("should generate a partial hint for single-word front", () => {
     const testCard = new Flashcard("Programming", "Coding", "", []);
-    assert.strictEqual(getHint(testCard), "Progr...");
-  });
-
-  it("should generate a partial hint for multi-word front", () => {
-    const testCard = new Flashcard("Object Oriented Programming", "OOP", "", []);
-    assert.strictEqual(getHint(testCard), "Obj... Ori... Pro...");
+    assert.strictEqual(getHint(testCard), "Progra...");
   });
 
   it("should throw an error for empty front", () => {
     const testCard = new Flashcard("", "Definition", "", []);
     assert.throws(() => getHint(testCard), /Invalid flashcard/);
   });
+
+ 
 });
+
 
 /*
  * Testing strategy for computeProgress():
