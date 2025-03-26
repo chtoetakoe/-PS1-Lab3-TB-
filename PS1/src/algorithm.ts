@@ -185,11 +185,21 @@ export function getHint(card: Flashcard): string {
  * @returns statistics about learning progress.
  * @spec.requires [SPEC TO BE DEFINED]
  */
-export function computeProgress(buckets: any, history: any): any {
-  // Replace 'any' with appropriate types
-  // TODO: Implement this function (and define the spec!)
-  throw new Error("Implement me!");
+export function computeProgress(
+  buckets: BucketMap,
+  history: Map<Flashcard, AnswerDifficulty[]>
+): { totalCards: number; bucketCounts: Map<number, number> } {
+  const bucketCounts = new Map<number, number>();
+  let totalCards = 0;
+
+  for (const [bucket, cards] of buckets.entries()) {
+    bucketCounts.set(bucket, cards.size);
+    totalCards += cards.size;
+  }
+
+  return { totalCards, bucketCounts };
 }
+
 
 /**
 * Checks if a number is prime.
@@ -199,15 +209,14 @@ export function computeProgress(buckets: any, history: any): any {
 *           (Note: 0 and 1 are NOT prime numbers)
 */
 export function isPrime(n: number): boolean {
-  // if (n < 2) return false; // 0 and 1 are not prime
-  // if (n === 2 || n === 3) return true; // 2 and 3 are prime
-  // if (n % 2 === 0 || n % 3 === 0) return false; // Exclude even numbers and multiples of 3
+  if (n < 2) return false;
+  if (n === 2 || n === 3) return true;
+  if (n % 2 === 0 || n % 3 === 0) return false;
 
-  // // Check from 5 to sqrt(n), skipping even numbers
-  // for (let i = 5; i * i <= n; i += 6) {
-  //   if (n % i === 0 || n % (i + 2) === 0) {
-  //     return false;
-  //   }
-  // }
+  for (let i = 5; i * i <= n; i += 6) {
+    if (n % i === 0 || n % (i + 2) === 0) return false;
+  }
+
   return true;
 }
+
