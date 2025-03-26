@@ -126,9 +126,14 @@ describe("update()", () => {
  */
 
 describe("getHint()", () => {
-  it("should generate a partial hint for single-word front", () => {
+  it("should generate a partial hint for a single-word front", () => {
     const testCard = new Flashcard("Programming", "Coding", "", []);
     assert.strictEqual(getHint(testCard), "Progra...");
+  });
+
+  it("should generate a partial hint for a multi-word front", () => {
+    const testCard = new Flashcard("Object Oriented Programming", "OOP", "", []);
+    assert.strictEqual(getHint(testCard), "Obj... Ori... Pro...");
   });
 
   it("should throw an error for empty front", () => {
@@ -136,8 +141,14 @@ describe("getHint()", () => {
     assert.throws(() => getHint(testCard), /Invalid flashcard/);
   });
 
- 
+  it("should correctly handle short words and spaces", () => {
+    const testCard = new Flashcard("I am AI", "Artificial Intelligence", "", []);
+    assert.strictEqual(getHint(testCard), "I... am... A...");
+  });
 });
+
+
+
 
 
 /*

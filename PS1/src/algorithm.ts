@@ -151,8 +151,6 @@ export function update(
 
 
 
-
-
 /**
  * Generates a hint for a flashcard.
  *
@@ -165,17 +163,18 @@ export function getHint(card: Flashcard): string {
     throw new Error("Invalid flashcard");
   }
 
-  const words = card.front.split(" ");
-  if (words.length === 0 || !words[0]) {
-    return "..."; // Return default hint if no valid words
+  const words = card.front.split(/\s+/).filter(word => word.length > 0);
+  if (words.length === 0) {
+    return "..."; // Default hint for empty input
   }
 
   return words
-    .map(word => word.slice(0, Math.ceil(word.length / 2)) + "...")
+    .map(word => {
+      const sliceLength = Math.max(1, Math.ceil(word.length / 2));
+      return word.slice(0, sliceLength) + "...";
+    })
     .join(" ");
 }
-
-
 
 
 /**
