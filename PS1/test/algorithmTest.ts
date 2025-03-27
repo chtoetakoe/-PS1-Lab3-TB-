@@ -7,7 +7,7 @@ import {
   update,
   getHint,
   computeProgress,
-  isPrime
+  
 } from "../src/algorithm";
 
 /*
@@ -174,22 +174,5 @@ describe("computeProgress()", () => {
     assert.strictEqual(result.totalCards, 3);
     assert.strictEqual(result.bucketCounts.get(0), 1);
     assert.strictEqual(result.bucketCounts.get(1), 2);
-  });
-});
-
-
-describe("isPrime()", () => {
-  it("should return true for prime numbers", () => {
-    assert.strictEqual(isPrime(2), true);
-    assert.strictEqual(isPrime(3), true);
-    assert.strictEqual(isPrime(5), true);
-    assert.strictEqual(isPrime(7), true);
-  });
-
-  it("should return false for non-primes", () => {
-    assert.strictEqual(isPrime(0), false);
-    assert.strictEqual(isPrime(1), false);
-    assert.strictEqual(isPrime(4), false);
-    assert.strictEqual(isPrime(9), false);
   });
 });

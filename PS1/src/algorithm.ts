@@ -201,22 +201,5 @@ export function computeProgress(
 }
 
 
-/**
-* Checks if a number is prime.
-* @param n a non-negative integer
-* @returns true if n is a prime number, false otherwise.
-* @spec.requires n is an integer, n >= 0
-*           (Note: 0 and 1 are NOT prime numbers)
-*/
-export function isPrime(n: number): boolean {
-  if (n < 2) return false;
-  if (n === 2 || n === 3) return true;
-  if (n % 2 === 0 || n % 3 === 0) return false;
 
-  for (let i = 5; i * i <= n; i += 6) {
-    if (n % i === 0 || n % (i + 2) === 0) return false;
-  }
-
-  return true;
-}
 
