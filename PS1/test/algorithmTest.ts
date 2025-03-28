@@ -147,10 +147,6 @@ describe("getHint()", () => {
   });
 });
 
-
-
-
-
 /*
  * Testing strategy for computeProgress():
  *
