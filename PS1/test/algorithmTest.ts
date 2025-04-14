@@ -122,18 +122,22 @@ describe("update()", () => {
 /*
  * Testing strategy for getHint():
  *
- * TODO: Describe your testing strategy for getHint() here.
+ * Partitions:
+ * - Single-word front, non-empty back
+ * - Multi-word front, non-empty back
+ * - Empty front (should throw)
+ * - Short words and multiple spaces
+ * - Tag-based hint enrichment (e.g., "math", "history")
  */
-
 describe("getHint()", () => {
-  it("should generate a partial hint for a single-word front", () => {
+  it("should generate a deterministic hint for a single-word front", () => {
     const testCard = new Flashcard("Programming", "Coding", "", []);
-    assert.strictEqual(getHint(testCard), "Progra...");
+    assert.strictEqual(getHint(testCard), "Starts with: Co...");
   });
 
-  it("should generate a partial hint for a multi-word front", () => {
+  it("should generate a deterministic hint for a multi-word front", () => {
     const testCard = new Flashcard("Object Oriented Programming", "OOP", "", []);
-    assert.strictEqual(getHint(testCard), "Obj... Orie... Progra...");
+    assert.strictEqual(getHint(testCard), "Starts with: OO...");
   });
 
   it("should throw an error for empty front", () => {
@@ -143,9 +147,26 @@ describe("getHint()", () => {
 
   it("should correctly handle short words and spaces", () => {
     const testCard = new Flashcard("I am AI", "Artificial Intelligence", "", []);
-    assert.strictEqual(getHint(testCard), "I... a... A...");
+    assert.strictEqual(getHint(testCard), "Starts with: Ar...");
+  });
+
+  it("should generate a context-aware hint based on tags", () => {
+    const testCard = new Flashcard("Battle of Hastings", "1066", "Major historical event", ["history"]);
+    assert.strictEqual(
+      getHint(testCard),
+      "Major historical event. Think about the historical context. Starts with: 10..."
+    );
+  });
+
+  it("should include hint if provided and tag is not matched", () => {
+    const testCard = new Flashcard("Sum of angles in triangle", "180", "It's a common math fact", ["geometry"]);
+    assert.strictEqual(
+      getHint(testCard),
+      "It's a common math fact. Starts with: 18..."
+    );
   });
 });
+
 
 /*
  * Testing strategy for computeProgress():

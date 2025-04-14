@@ -163,18 +163,19 @@ export function getHint(card: Flashcard): string {
     throw new Error("Invalid flashcard");
   }
 
-  const words = card.front.split(/\s+/).filter(word => word.length > 0);
-  if (words.length === 0) {
-    return "..."; // Default hint for empty input
+  const baseHint = card.hint ? `${card.hint}. ` : "";
+  const backPreview = card.back ? `Starts with: ${card.back.slice(0, 2)}...` : "";
+
+  // Optional: context-aware hints
+  if (card.tags.includes("history")) {
+    return `${baseHint}Think about the historical context. ${backPreview}`;
+  } else if (card.tags.includes("math")) {
+    return `${baseHint}It's related to a math formula. ${backPreview}`;
   }
 
-  return words
-    .map(word => {
-      const sliceLength = Math.max(1, Math.ceil(word.length / 2));
-      return word.slice(0, sliceLength) + "...";
-    })
-    .join(" ");
+  return `${baseHint}${backPreview}`;
 }
+
 
 
 /**
@@ -188,7 +189,15 @@ export function getHint(card: Flashcard): string {
 export function computeProgress(
   buckets: BucketMap,
   history: Map<Flashcard, AnswerDifficulty[]>
-): { totalCards: number; bucketCounts: Map<number, number> } {
+): {
+  totalCards: number;
+  bucketCounts: Map<number, number>;
+  averageDifficulty?: number;
+} {
+  if (!buckets || !(buckets instanceof Map)) {
+    throw new Error("Invalid bucket structure");
+  }
+
   const bucketCounts = new Map<number, number>();
   let totalCards = 0;
 
@@ -197,7 +206,23 @@ export function computeProgress(
     totalCards += cards.size;
   }
 
-  return { totalCards, bucketCounts };
+  let totalDiff = 0;
+  let count = 0;
+
+  for (const difficulties of history.values()) {
+    for (const d of difficulties) {
+      totalDiff += d;
+      count++;
+    }
+  }
+
+  const averageDifficulty = count > 0 ? totalDiff / count : undefined;
+
+  return {
+    totalCards,
+    bucketCounts,
+    averageDifficulty,
+  };
 }
 
 
